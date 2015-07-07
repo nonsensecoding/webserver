@@ -17,9 +17,11 @@ class webserver (
   $files_owner   = 'root',
   $files_group   = 'apache',
   $files_mode    = '0664',
-) {
+)
+{
 
-  include packages
+  #httpd package for apache
+  $httpd_basic = ['httpd', 'mod_ssl']
 
   # get data specified in hiera
   $webserver_hash = hiera_hash('web_server')
@@ -41,7 +43,9 @@ class webserver (
     }
     'false': {
       # install apache
-      Package <| tag == 'httpd_basic' |>
+      package { $httpd_basic:
+        ensure => present,
+      }
 
       file { '/etc/httpd':
         ensure  => $httpd_ensure,
@@ -57,7 +61,9 @@ class webserver (
   }
 
   # create resources defined in hiera
-  Package <| tag == [ $package_tags ] |>
+  package { $package_tags:
+    ensure => present,
+  }
 
   if $dirs {
     webserver::dirs {[ $dirs ]:

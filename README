@@ -5,14 +5,13 @@ This is the webserver module.
 Description
 -------
 Builds the serverrole "webserver"
-the module is fully managed by the hiera file: roles/webserver.yaml
 
 first of all there are two options:
   - managed webserver
   - unmanaged webserver
 
 managed webserver:
-- includes apache
+- includes apache (puppetlabs module, tested with version 0.4.0)
 - realizes the package lists given from the hiera file
 - collects the vhost data from the hiera file
 - realizes the vhosts with the variables and the apache::vhost class
@@ -38,14 +37,9 @@ database:
 module includes
 -------
 - apache
-- packages
+- database
 
 defined resources
 -------
 - apache::vhost
 - database
-
-Contact
--------
-Max Mayer
-Stefan Harlander
