@@ -3,43 +3,43 @@
 # Webserver class calls apache module and realises the vhost given from hiera
 #
 class webserver (
-  $httpd_ensure  = 'directory',
-  $httpd_mode    = '0664',
-  $httpd_owner   = 'root',
-  $httpd_group   = 'apache',
-  $httpd_recurse = 'true',
-  $dirs_owner    = 'root',
-  $dirs_group    = 'apache',
-  $dirs_mode     = '0664',
-  $rdirs_owner   = 'root',
-  $rdirs_group   = 'apache',
-  $rdirs_mode    = '0664',
-  $files_owner   = 'root',
-  $files_group   = 'apache',
-  $files_mode    = '0664',
+  $httpd_ensure   = 'directory',
+  $httpd_mode     = '0664',
+  $httpd_owner    = 'root',
+  $httpd_group    = 'apache',
+  $httpd_recurse  = 'true',
+  $dirs_owner     = 'root',
+  $dirs_group     = 'apache',
+  $dirs_mode      = '0664',
+  $rdirs_owner    = 'root',
+  $rdirs_group    = 'apache',
+  $rdirs_mode     = '0664',
+  $files_owner    = 'root',
+  $files_group    = 'apache',
+  $files_mode     = '0664',
+  $webserver      = {},
+  $webserver_type = 'apache',
 )
 {
-
-  #httpd package for apache
-  $httpd_basic = ['httpd', 'mod_ssl']
+  case $webserver_type {
+    'apache': {  $httpd_basic = ['httpd', 'mod_ssl'] }
+    default : { fail("Webserver is not supported! Currently supported webserver(s) are: apache")}
+  }
 
   # get data specified in hiera
-  $webserver_hash = hiera_hash('web_server')
-  $webserver_data = $webserver_hash[$::hostname]
+  $webserver_data = $webserver[$::hostname]
 
   # variables for host
-  $managed = $webserver_data['managed']
-  $package_tags = $webserver_data['packages']
-  $dirs = $webserver_data['dirs']
-  $rdirs = $webserver_data['rdirs']
-  $files = $webserver_data['files']
+  $packages     = $webserver_data['packages']
+  $dirs         = $webserver_data['dirs']
+  $rdirs        = $webserver_data['rdirs']
+  $files        = $webserver_data['files']
+  $vhosts       = $webserver_data['vhosts']
 
   case $managed {
     'true': {
-      include apache
       # get and realize vhost
-      $vhost = $webserver_data['vhost']
-      webserver::vhost {[ $vhost ]:;}
+      webserver::vhost {[ $vhosts ]:;}
     }
     'false': {
       # install apache
@@ -61,7 +61,7 @@ class webserver (
   }
 
   # create resources defined in hiera
-  package { $package_tags:
+  package { $packages:
     ensure => present,
   }
 
