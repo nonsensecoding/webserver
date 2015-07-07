@@ -1,0 +1,51 @@
+webserver
+
+This is the webserver module.
+
+Description
+-------
+Builds the serverrole "webserver"
+the module is fully managed by the hiera file: roles/webserver.yaml
+
+first of all there are two options:
+  - managed webserver
+  - unmanaged webserver
+
+managed webserver:
+- includes apache
+- realizes the package lists given from the hiera file
+- collects the vhost data from the hiera file
+- realizes the vhosts with the variables and the apache::vhost class
+
+unmanaged webserver:
+- realizes the package httpd_basic by default
+- realizes the package lists given from the hiera file
+- sets root:apache 664 permissons to /etc/httpd/*
+- sets root:apache 664 permissons to all files given from hiera
+
+next step is to specify a vhost (and database) for a server
+
+vhost:
+- all options possible which are setable in apache::vhost
+- database option calls the database module
+- managecontent option which can be secified for a vhost.conf
+- creates the vhost by using apache module
+
+database:
+- options setable listed in the database module
+- creates a DB with the given options (default: mysql)
+
+module includes
+-------
+- apache
+- packages
+
+defined resources
+-------
+- apache::vhost
+- database
+
+Contact
+-------
+Max Mayer
+Stefan Harlander
